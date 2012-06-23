@@ -6,6 +6,10 @@ contestants can "ping" the server with their GPS coordinates and get back a list
 these distances have a certain fuzz-factor (==random error) that depends on the scale of the distance
 (so if you're close it might be tens of meters but if your far it might be or hundreds of km).
 
+To get better estimate of the locations of the waypoints draw circles on the map after the ping (center on your location,
+radius by distance), then move a bit (depending on the scale this might be several km) and ping again, draw another set of circles
+and a pattern will start emerging.
+
 Each ping gives a time penalty that is somehow based on the scale of the race (if we draw a circle around all 
 the waypoints we can use the radius as base for that scale), if all waypoints are inside a smallish city (say Helsinki...)
 then the penalty can be minutes but if the scale is something like whole of Finland then they need to be hours.
