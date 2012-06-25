@@ -237,6 +237,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
     def map_clicked(self, osm, event):
         lat,lon = self.osm.get_event_location(event).get_degrees()
         if event.button == 1:
+            self.osm.set_center(lat,lon)
             self.latlon_entry.set_text(
                 'Map Centre: latitude %s longitude %s' % (
                     self.osm.props.latitude,
