@@ -8,13 +8,21 @@ waypoints:
     - title: Varusteleka
       lat: 60.2378501892
       lon: 24.85871315
+home:
+    lat: 60.1948814392
+    lon: 24.951253891
+    zoom: 8
 distance_fuzz_factor: 0.1 #10% random error in distance
 markers:
     pin:
         file: pin_marker.png
         size: [20,34]
-        offset: [0,0]
+        offset: [0.5,1.0]
     star: 
         file: star_marker.png
         size: [24,24]
-        offset: [0,0]
+        offset: [0.5,0.5]
+    beacon: 
+        file: beacon_marker.png
+        size: [34,34]
+        offset: [0.5,0.49]

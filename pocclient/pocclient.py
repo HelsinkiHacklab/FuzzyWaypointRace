@@ -171,6 +171,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         self.vbox.pack_end(self.latlon_entry, False)
         self.vbox.pack_end(hbox, False)
 
+        gobject.timeout_add(100, self.home_clicked, None)
         gobject.timeout_add(500, self.print_tiles)
 
     def disable_cache_toggled(self, btn):
@@ -214,7 +215,8 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         self.osm.set_zoom(self.osm.props.zoom - 1)
 
     def home_clicked(self, button):
-        self.osm.set_center_and_zoom(-44.39, 171.25, 12)
+        home = self.config['home']
+        self.osm.set_center_and_zoom(home['lat'], home['lon'], home['zoom'])
 
     def on_query_tooltip(self, widget, x, y, keyboard_tip, tooltip, data=None):
         if keyboard_tip:
@@ -237,6 +239,13 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
             zoom_end=self.osm.props.max_zoom
         )
 
+
+    def add_marker(self, marker_id, lat, lon):
+        marker = self.config['markers'][marker_id]
+        pb = gtk.gdk.pixbuf_new_from_file_at_size (marker['file'], marker['size'][0],marker['size'][1])
+        self.osm.image_add_with_alignment(lat,lon,pb,marker['offset'][0],marker['offset'][1])
+        
+
     def map_clicked(self, osm, event):
         lat,lon = self.osm.get_event_location(event).get_degrees()
         if event.button == 1:
@@ -250,8 +259,8 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         elif event.button == 2:
             self.osm.gps_add(lat, lon, heading=osmgpsmap.INVALID);
         elif event.button == 3:
-            pb = gtk.gdk.pixbuf_new_from_file_at_size ("poi.png", 24,24)
-            self.osm.image_add(lat,lon,pb)
+            ##self.add_marker('pin', lat, lon)
+            self.add_marker('beacon', lat, lon)
 
 if __name__ == "__main__":
     with open(os.path.realpath(__file__).replace('.py', '.yml')) as f:
