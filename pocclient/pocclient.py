@@ -113,7 +113,8 @@ class UI(gtk.Window):
         hbox.pack_start(zoom_in_button)
         hbox.pack_start(zoom_out_button)
         hbox.pack_start(home_button)
-        hbox.pack_start(cache_button)
+#        hbox.pack_start(cache_button)
+        hbox.pack_start(wp_button)
 
         #add ability to test custom map URIs
         ex = gtk.Expander("<b>Map Repository URI</b>")
@@ -210,11 +211,13 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
     def toggle_waypoints(self, *args):
         if self.waypoints:
             for img in self.waypoints:
-                img.free()
+                self.osm.image_remove(img)
             self.waypoints = None
             return
+        self.waypoints = []
         for wp in self.config['waypoints']:
             img = self.add_marker('pin', wp['lat'], wp['lon'])
+            self.waypoints.append(img)
 
     def print_tiles(self):
         if self.osm.props.tiles_queued != 0:
