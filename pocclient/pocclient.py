@@ -177,6 +177,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         gobject.timeout_add(100, self.home_clicked, None)
         gobject.timeout_add(500, self.print_tiles)
         self.waypoints = None
+        self.marker_cache = {}
 
     def disable_cache_toggled(self, btn):
         if btn.props.active:
@@ -258,9 +259,9 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
 
     def add_marker(self, marker_id, lat, lon):
         marker = self.config['markers'][marker_id]
-        pb = gtk.gdk.pixbuf_new_from_file_at_size (marker['file'], marker['size'][0],marker['size'][1])
-        return self.osm.image_add_with_alignment(lat,lon,pb,marker['offset'][0],marker['offset'][1])
-        
+        if not self.marker_cache.has_key(marker_id):
+            self.marker_cache[marker_id] = gtk.gdk.pixbuf_new_from_file_at_size (marker['file'], marker['size'][0],marker['size'][1])
+        return self.osm.image_add_with_alignment(lat,lon,self.marker_cache[marker_id],marker['offset'][0],marker['offset'][1])
 
     def map_clicked(self, osm, event):
         lat,lon = self.osm.get_event_location(event).get_degrees()
