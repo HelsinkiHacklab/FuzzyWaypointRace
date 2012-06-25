@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from __future__ import with_statement
+import yaml
 
 """
 Copyright (C) Hadley Rich 2008 <hads@nice.net.nz>
@@ -58,8 +60,9 @@ class DummyLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
 gobject.type_register(DummyLayer)
 
 class UI(gtk.Window):
-    def __init__(self):
+    def __init__(self, config):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        self.config = config
 
         self.set_default_size(500, 500)
         self.connect('destroy', lambda x: gtk.main_quit())
@@ -251,7 +254,9 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
             self.osm.image_add(lat,lon,pb)
 
 if __name__ == "__main__":
-    u = UI()
+    with open(os.path.realpath(__file__).replace('.py', '.yml')) as f:
+        config = yaml.load(f)
+    u = UI(config)
     u.show_all()
     if os.name == "nt": gtk.gdk.threads_enter()
     gtk.main()

@@ -1,0 +1,20 @@
+waypoints:
+    - title: afHeurlinia
+      lat: 60.1212844849
+      lon: 24.3986606598
+    - title: Helsinki Hacklab
+      lat: 60.1948814392
+      lon: 24.951253891
+    - title: Varusteleka
+      lat: 60.2378501892
+      lon: 24.85871315
+distance_fuzz_factor: 0.1 #10% random error in distance
+markers:
+    pin:
+        file: pin_marker.png
+        size: [20,34]
+        offset: [0,0]
+    star: 
+        file: star_marker.png
+        size: [24,24]
+        offset: [0,0]
