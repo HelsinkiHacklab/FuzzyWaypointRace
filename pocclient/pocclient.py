@@ -103,8 +103,10 @@ class UI(gtk.Window):
         zoom_out_button.connect('clicked', self.zoom_out_clicked)
         home_button = gtk.Button(stock=gtk.STOCK_HOME)
         home_button.connect('clicked', self.home_clicked)
-        cache_button = gtk.Button('Cache')
-        cache_button.connect('clicked', self.cache_clicked)
+#        cache_button = gtk.Button('Cache')
+#        cache_button.connect('clicked', self.cache_clicked)
+        wp_button = gtk.Button('Waypoints')
+        wp_button.connect('clicked', self.toggle_waypoints)
 
         self.vbox.pack_start(self.osm)
         hbox = gtk.HBox(False, 0)
@@ -173,6 +175,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
 
         gobject.timeout_add(100, self.home_clicked, None)
         gobject.timeout_add(500, self.print_tiles)
+        self.waypoints = None
 
     def disable_cache_toggled(self, btn):
         if btn.props.active:
@@ -202,6 +205,16 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
             self.vbox.pack_start(self.osm, True)
             self.osm.connect('button_release_event', self.map_clicked)
             self.osm.show()
+
+
+    def toggle_waypoints(self, *args):
+        if self.waypoints:
+            for img in self.waypoints:
+                img.free()
+            self.waypoints = None
+            return
+        for wp in self.config['waypoints']:
+            img = self.add_marker('pin', wp['lat'], wp['lon'])
 
     def print_tiles(self):
         if self.osm.props.tiles_queued != 0:
@@ -243,7 +256,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
     def add_marker(self, marker_id, lat, lon):
         marker = self.config['markers'][marker_id]
         pb = gtk.gdk.pixbuf_new_from_file_at_size (marker['file'], marker['size'][0],marker['size'][1])
-        self.osm.image_add_with_alignment(lat,lon,pb,marker['offset'][0],marker['offset'][1])
+        return self.osm.image_add_with_alignment(lat,lon,pb,marker['offset'][0],marker['offset'][1])
         
 
     def map_clicked(self, osm, event):
