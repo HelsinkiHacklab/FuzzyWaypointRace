@@ -65,8 +65,7 @@ class DummyLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
         return False
 gobject.type_register(DummyLayer)
 
-# stolen from https://gramps.svn.sourceforge.net/svnroot/gramps/trunk/src/plugins/lib/maps/selectionlayer.py
-class SelectionLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
+class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
     def __init__(self):
         """
         Initialize thz selection layer
@@ -125,7 +124,7 @@ class SelectionLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
         """
         return False
 
-gobject.type_register(SelectionLayer)
+gobject.type_register(CircleLayer)
 
 
 
@@ -153,7 +152,7 @@ class UI(gtk.Window):
         self.osm.layer_add(
                     DummyLayer())
 
-        self.sl = SelectionLayer()
+        self.sl = CircleLayer()
         self.osm.layer_add(self.sl)
 
         self.osm.connect('button_release_event', self.map_clicked)
