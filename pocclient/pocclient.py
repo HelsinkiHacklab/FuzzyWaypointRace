@@ -207,7 +207,7 @@ class UI(gtk.Window):
 
         self.latlon_entry = gtk.Entry()
         self.radius_entry = gtk.Entry()
-        self.radius_entry.set_text("0.1")
+        self.radius_entry.set_text("0.5")
 
         zoom_in_button = gtk.Button(stock=gtk.STOCK_ZOOM_IN)
         zoom_in_button.connect('clicked', self.zoom_in_clicked)
