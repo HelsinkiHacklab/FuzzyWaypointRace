@@ -8,6 +8,9 @@ waypoints:
     - title: Varusteleka
       lat: 60.2378501892
       lon: 24.85871315
+    - title: Kinkki
+      lat: 60.1951141357
+      lon: 24.9548549652
 home:
     lat: 60.1948814392
     lon: 24.951253891

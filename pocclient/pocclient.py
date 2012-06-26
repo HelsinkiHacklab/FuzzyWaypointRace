@@ -1,6 +1,11 @@
 #!/usr/bin/python
 from __future__ import with_statement
 import yaml
+import os,sys
+libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 'lib')
+if os.path.isdir(libs_dir):                                       
+    sys.path.append(libs_dir)
+import haversine
 
 """
 Copyright (C) Hadley Rich 2008 <hads@nice.net.nz>

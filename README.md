@@ -41,4 +41,9 @@ can be sent and then the reply list of distances is shown on the display (these 
      is not done for you [the point is that contestants a paper map and draw circles on it, or they could code their own visualizer...]), it
      will also keep local copy of your full GPS track for further reference.
 
+## Dependencies
+
+  - GeoPy http://code.google.com/p/geopy/wiki/Installation
+  - osm-gps-map http://nzjrs.github.com/osm-gps-map/
+
 
