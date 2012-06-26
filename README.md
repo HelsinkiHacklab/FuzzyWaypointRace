@@ -27,7 +27,7 @@ large list of waypoints and when creating a race the server will do a random sel
 
 For more "serious" races we need to make a simple "Ping device" that has GPS, GSM, SD-card, display and a simple MCU to tie
 all this together, packaged so that tampering is evident, it will act as route tracker (store on SD) and by pressing a button a ping
-can be sent and then the reply list of distances is shown on the display (these devices are identified by they GSM IMEI to the server)
+can be sent and then the reply list of distances is shown on the display (these devices are identified by their GSM IMEI to the server)
 
 ## TODO
 
@@ -43,8 +43,7 @@ can be sent and then the reply list of distances is shown on the display (these 
 
 ## Dependencies
 
+  - python-osmgpsmap http://nzjrs.github.com/osm-gps-map/
   - GeoPy http://code.google.com/p/geopy/wiki/Installation
-  - osm-gps-map http://nzjrs.github.com/osm-gps-map/
-  - python-pyproj
 
 

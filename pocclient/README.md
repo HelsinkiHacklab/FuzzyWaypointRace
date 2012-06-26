@@ -5,7 +5,3 @@ Used to test the scaling and fuzzing functions, basic idea is that the waypoints
 Clicking on the map will set your "current position" there and then clicking on a "ping" button will do a ping, the result
 is immediately visualized on the map as circles (ponder: use line thickness to indicate the uncertainty [since here we know it] ?)
 
-## TODO
-
-To calculate the circles switch to UTM coordinates and there caculate X km north/south/west/east then convert those points back to WGS-84
-and then use the OSM helpers to get the local display coordinates for drawing the ellipse.

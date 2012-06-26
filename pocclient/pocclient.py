@@ -81,28 +81,13 @@ class SelectionLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
         """
         self.circles.append((rds, lat, lon))
 
-    def add_rectangle(self, cp1, cp2):
-        """
-        Add a rectangle
-        """
-        self.rectangles.append((cp1, cp2))
-
     def do_draw(self, gpsmap, drawable):
         """
         draw the circles and the rectangles
         """
         ggc = drawable.new_gc()
         for circle in self.circles:
-# The radius in degreees messes stuff up when being a bit farther rom equator            
-#            top_left = osmgpsmap.point_new_degrees(circle[1] + circle[0],
-#                                                   circle[2] - circle[0])
-#            bottom_right = osmgpsmap.point_new_degrees(circle[1] - circle[0],
-#                                                       circle[2] + circle[0])
-#            crd_x, crd_y = gpsmap.convert_geographic_to_screen(top_left)
-#            crd_x2, crd_y2 = gpsmap.convert_geographic_to_screen(bottom_right)
-#            drawable.draw_arc(ggc, False, crd_x, crd_y, crd_x2 - crd_x,
-#                              crd_y2 - crd_y, 0, 360*64)
-            # TODO: Calculate four "corners" (n,e,s,w) of the ellipse by distance, use proj to switch between projections if neccessary
+            # TODO: Calculate only the nw and sw corners
             d = geopy.distance.VincentyDistance(kilometers=circle[0])
             center = geopy.point.Point(circle[1], circle[2])
             np = d.destination(center, 0)
@@ -121,27 +106,6 @@ class SelectionLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
 
             # TODO: There probably is a better way to calculate these but I don't care, this works now
             drawable.draw_arc(ggc, False, view_wp[0], view_np[1], (view_ep[0] - view_wp[0]), (view_sp[1] - view_np[1]), 0, 360*64)
-
-
-        for rectangle in self.rectangles:
-            top_left, bottom_right = rectangle
-            crd_x, crd_y = gpsmap.convert_geographic_to_screen(top_left)
-            crd_x2, crd_y2 = gpsmap.convert_geographic_to_screen(bottom_right)
-            # be sure when can select a region in all case.
-            if ( crd_x < crd_x2 ):
-                if ( crd_y < crd_y2 ):
-                    drawable.draw_rectangle(ggc, False, crd_x, crd_y,
-                                            crd_x2 - crd_x, crd_y2 - crd_y)
-                else:
-                    drawable.draw_rectangle(ggc, False, crd_x, crd_y2,
-                                            crd_x2 - crd_x, crd_y - crd_y2)
-            else:
-                if ( crd_y < crd_y2 ):
-                    drawable.draw_rectangle(ggc, False, crd_x2, crd_y,
-                                            crd_x - crd_x2, crd_y2 - crd_y)
-                else:
-                    drawable.draw_rectangle(ggc, False, crd_x2, crd_y2,
-                                            crd_x - crd_x2, crd_y - crd_y2)
 
     def do_render(self, gpsmap):
         """
