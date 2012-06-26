@@ -45,5 +45,6 @@ can be sent and then the reply list of distances is shown on the display (these 
 
   - GeoPy http://code.google.com/p/geopy/wiki/Installation
   - osm-gps-map http://nzjrs.github.com/osm-gps-map/
+  - python-pyproj
 
 
