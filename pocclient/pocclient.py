@@ -59,6 +59,84 @@ class DummyLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
         return False
 gobject.type_register(DummyLayer)
 
+# stolen from https://gramps.svn.sourceforge.net/svnroot/gramps/trunk/src/plugins/lib/maps/selectionlayer.py
+class SelectionLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
+    def __init__(self):
+        """
+        Initialize thz selection layer
+        """
+        gobject.GObject.__init__(self)
+        self.circles = []
+        self.rectangles = []
+
+    def add_circle(self, rds, lat, lon):
+        """
+        Add a circle
+        """
+        self.circles.append((rds, lat, lon))
+
+    def add_rectangle(self, cp1, cp2):
+        """
+        Add a rectangle
+        """
+        self.rectangles.append((cp1, cp2))
+
+    def do_draw(self, gpsmap, drawable):
+        """
+        draw the circles and the rectangles
+        """
+        ggc = drawable.new_gc()
+        for circle in self.circles:
+            top_left = osmgpsmap.point_new_degrees(circle[1] + circle[0],
+                                                   circle[2] - circle[0])
+            bottom_right = osmgpsmap.point_new_degrees(circle[1] - circle[0],
+                                                       circle[2] + circle[0])
+            crd_x, crd_y = gpsmap.convert_geographic_to_screen(top_left)
+            crd_x2, crd_y2 = gpsmap.convert_geographic_to_screen(bottom_right)
+            drawable.draw_arc(ggc, False, crd_x, crd_y, crd_x2 - crd_x,
+                              crd_y2 - crd_y, 0, 360*64)
+        for rectangle in self.rectangles:
+            top_left, bottom_right = rectangle
+            crd_x, crd_y = gpsmap.convert_geographic_to_screen(top_left)
+            crd_x2, crd_y2 = gpsmap.convert_geographic_to_screen(bottom_right)
+            # be sure when can select a region in all case.
+            if ( crd_x < crd_x2 ):
+                if ( crd_y < crd_y2 ):
+                    drawable.draw_rectangle(ggc, False, crd_x, crd_y,
+                                            crd_x2 - crd_x, crd_y2 - crd_y)
+                else:
+                    drawable.draw_rectangle(ggc, False, crd_x, crd_y2,
+                                            crd_x2 - crd_x, crd_y - crd_y2)
+            else:
+                if ( crd_y < crd_y2 ):
+                    drawable.draw_rectangle(ggc, False, crd_x2, crd_y,
+                                            crd_x - crd_x2, crd_y2 - crd_y)
+                else:
+                    drawable.draw_rectangle(ggc, False, crd_x2, crd_y2,
+                                            crd_x - crd_x2, crd_y - crd_y2)
+
+    def do_render(self, gpsmap):
+        """
+        render the layer
+        """
+        pass
+
+    def do_busy(self):
+        """
+        set the map busy
+        """
+        return False
+
+    def do_button_press(self, gpsmap, gdkeventbutton):
+        """
+        Someone press a button
+        """
+        return False
+
+gobject.type_register(SelectionLayer)
+
+
+
 class UI(gtk.Window):
     def __init__(self, config):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
@@ -71,16 +149,20 @@ class UI(gtk.Window):
         self.vbox = gtk.VBox(False, 0)
         self.add(self.vbox)
 
+        # WTF is this here for ??
         if 0:
             self.osm = DummyMapNoGpsPoint()
         else:
             self.osm = osmgpsmap.GpsMap()
-        self.osm.layer_add(
-                    osmgpsmap.GpsMapOsd(
-                        show_dpad=True,
-                        show_zoom=True))
+#        self.osm.layer_add(
+#                    osmgpsmap.GpsMapOsd(
+#                        show_dpad=True,
+#                        show_zoom=True))
         self.osm.layer_add(
                     DummyLayer())
+
+        self.sl = SelectionLayer()
+        self.osm.layer_add(self.sl)
 
         self.osm.connect('button_release_event', self.map_clicked)
 
@@ -96,6 +178,8 @@ class UI(gtk.Window):
         self.osm.connect("query-tooltip", self.on_query_tooltip)
 
         self.latlon_entry = gtk.Entry()
+        self.radius_entry = gtk.Entry()
+        self.radius_entry.set_text("0.1")
 
         zoom_in_button = gtk.Button(stock=gtk.STOCK_ZOOM_IN)
         zoom_in_button.connect('clicked', self.zoom_in_clicked)
@@ -172,6 +256,7 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
 
         self.vbox.pack_end(ex, False)
         self.vbox.pack_end(self.latlon_entry, False)
+        self.vbox.pack_end(self.radius_entry, False)
         self.vbox.pack_end(hbox, False)
 
         gobject.timeout_add(100, self.home_clicked, None)
@@ -278,6 +363,9 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         elif event.button == 3:
             ##self.add_marker('pin', lat, lon)
             self.add_marker('beacon', lat, lon)
+            rds = float(self.radius_entry.get_text().replace(',', '.'))
+            self.sl.add_circle(rds, lat, lon)
+            
 
 if __name__ == "__main__":
     with open(os.path.realpath(__file__).replace('.py', '.yml')) as f:
