@@ -95,8 +95,6 @@ class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
             drawable.set_colormap(cmap)
             print "circle[3]: %s repr(c)=%s" % (circle[3], repr(c))
             ggc = drawable.new_gc(c,c)
-            ggc.set_foreground(c)
-            ggc.set_background(c)
             ggc.set_line_attributes(self.config['distance_line_width'], ggc.line_style, ggc.cap_style, ggc.join_style)
             # TODO: There probably is a better way to calculate these but I don't care, this works now
             drawable.draw_arc(ggc, False, view_wp[0], view_np[1], (view_ep[0] - view_wp[0]), (view_sp[1] - view_np[1]), 0, 360*64)
