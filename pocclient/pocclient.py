@@ -90,6 +90,9 @@ class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
 
             # Why do I get only circles of one color even though the debug lists correct values in the print ?
             c = gtk.gdk.color_parse(circle[3])
+            cmap = drawable.get_colormap()
+            c = cmap.alloc_color(c)
+            drawable.set_colormap(cmap)
             print "circle[3]: %s repr(c)=%s" % (circle[3], repr(c))
             ggc = drawable.new_gc(c,c)
             ggc.set_foreground(c)
