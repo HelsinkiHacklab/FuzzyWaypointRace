@@ -29,17 +29,23 @@ For more "serious" races we need to make a simple "Ping device" that has GPS, GS
 all this together, packaged so that tampering is evident, it will act as route tracker (store on SD) and by pressing a button a ping
 can be sent and then the reply list of distances is shown on the display (these devices are identified by their GSM IMEI to the server)
 
+## Done
+
+  - A proof-of-concept client used to test the distance calculation and fuzzing code, runs completely stand-alone.
+
 ## TODO
 
-  1. Write a simple implementation of the "ping server", first just for local use for testing the all the fuzzing and scaling factors
-  2. Write a simple ping visualizer where you can set your location on a map and the click "ping" and it will return you the distances and automatically draw the circles you use to
-     determine the locations of the waypoints, this can actually have the whole "ping server" internalized since the only goal here is tune the
-     scaling factors.
-  3. Write a network ping server with some sort of multi-user registration (each ping request is hashed with a token given to the user), at first it will
+  1. Write a network ping server with some sort of multi-user registration (each ping request is hashed with a token given to the user), at first it will
      only run one race at a time, but needs to be extendable multiple races (ie multiple waypoint sets).
-  4. Write Maemo/Meego/IOS/Android clients that will talk with the ping server (these clients will only return the list of distances, the visualization
+  2. Write Maemo/Meego/IOS/Android clients that will talk with the ping server (these clients will only return the list of distances, the visualization
      is not done for you [the point is that contestants a paper map and draw circles on it, or they could code their own visualizer...]), it
      will also keep local copy of your full GPS track for further reference.
+  3. Write a web-widget that displays the ping locations of racers on a map
+    - At least while the race is running do not display timestamps of pings
+      - There was an idea to allow limited count of "stealth" pings that are not shown on this map while the race is on.
+      - Also a good question is how check-in at a waypoint ? I'm leaning towards a ping (either stealth or normal) at the location (there obviously needs to be some sort of grace radius but I think not more than 15m)
+    - After the race has concluded add the waypoint markers on the map as well
+    - After the race has concluded display full GPS tracks (I guess this is somehow possible on OSM web api ?) on the map (the clients will upload the tracks to server at given intervals)
 
 ## Dependencies
 
