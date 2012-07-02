@@ -1,7 +1,11 @@
 Proof of Concept -Client
 ========================
 
-Used to test the scaling and fuzzing functions, basic idea is that the waypoints are known (and visibility toggleable)
-Clicking on the map will set your "current position" there and then clicking on a "ping" button will do a ping, the result
-is immediately visualized on the map as circles (ponder: use line thickness to indicate the uncertainty [since here we know it] ?)
+Used to test the scaling and fuzzing functions, basic idea is that the waypoints are configured to a known set (and visibility toggleable).
 
+The map works pretty much as expected, drag to move around, left-click centers the map, scrollwheel zooms. Right click pings the server and
+draws the distances as circles (the center point is also maked with a "radio tower" icon).
+
+Currently 5% linear fuzzing seems a reasonable value.
+
+The colors need a bit of thinking, I tried to get good contrasting colors from a colorwheel but it seems OSM uses very similar colorshceme.
