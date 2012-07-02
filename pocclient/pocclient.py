@@ -6,24 +6,9 @@ libs_dir = os.path.join(os.path.dirname( os.path.realpath( __file__ ) ),  '..', 
 if os.path.isdir(libs_dir):                                       
     sys.path.append(libs_dir)
 import geopy, geopy.distance
+import random
 
 
-"""
-Copyright (C) Hadley Rich 2008 <hads@nice.net.nz>
-based on main.c - with thanks to John Stowers
-
-This is free software: you can redistribute it and/or modify it
-under the terms of the GNU General Public License
-as published by the Free Software Foundation; version 2.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, see <http://www.gnu.org/licenses/>.
-"""
 
 import sys
 import os.path
@@ -136,17 +121,22 @@ class DummyServer:
     def __init__(self, config):
         self.config = config
         self.pings = []
+        self.real_distances = []
+        self.reported_distances = []
 
     def check_distance(self, lat, lon):
         self.pings.append((lat,lon))
         query_point = geopy.point.Point(lat, lon)
-        resp = []
+        real = []
+        reported = []
         for waypoint in self.config['waypoints']:
             wp_point = geopy.point.Point(waypoint['lat'], waypoint['lon'])
             d = geopy.distance.VincentyDistance(query_point, wp_point)
-            # TODO: Fuzz the distance
-            resp.append(d.kilometers)
-        return resp
+            real.append(d.kilometers)
+            reported.append(random.gauss(d.kilometers, self.config['distance_sigma']))
+        self.real_distances.append(real)
+        self.reported_distances.append(reported)
+        return reported
 
 class UI(gtk.Window):
     def __init__(self, config):
@@ -387,3 +377,4 @@ if __name__ == "__main__":
     gtk.main()
     if os.name == "nt": gtk.gdk.threads_leave()
     print "Ping locations: %s" % repr(server.pings)
+    print "Ping distances: %s" % repr(server.real_distances)
