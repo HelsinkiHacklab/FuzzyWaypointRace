@@ -66,25 +66,25 @@ class DummyLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
 gobject.type_register(DummyLayer)
 
 class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
-    def __init__(self):
+    def __init__(self, config):
         """
         Initialize thz selection layer
         """
+        self.config = config
         gobject.GObject.__init__(self)
         self.circles = []
         self.rectangles = []
 
-    def add_circle(self, rds, lat, lon):
+    def add_circle(self, rds, lat, lon, color='#000000'):
         """
         Add a circle
         """
-        self.circles.append((rds, lat, lon))
+        self.circles.append((rds, lat, lon, color))
 
     def do_draw(self, gpsmap, drawable):
         """
         draw the circles and the rectangles
         """
-        ggc = drawable.new_gc()
         for circle in self.circles:
             # TODO: Calculate only the nw and sw corners
             d = geopy.distance.VincentyDistance(kilometers=circle[0])
@@ -103,6 +103,11 @@ class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
             view_sp = gpsmap.convert_geographic_to_screen(osm_sp)
             view_wp = gpsmap.convert_geographic_to_screen(osm_wp)
 
+            # Why do I get only circles of one color even though the debug lists correct values in the print ?
+            ggc = drawable.new_gc()
+            print "Color: %s" % circle[3]
+            ggc.set_foreground(gtk.gdk.Color(circle[3]))
+            ggc.set_line_attributes(self.config['distance_line_width'], ggc.line_style, ggc.cap_style, ggc.join_style)
             # TODO: There probably is a better way to calculate these but I don't care, this works now
             drawable.draw_arc(ggc, False, view_wp[0], view_np[1], (view_ep[0] - view_wp[0]), (view_sp[1] - view_np[1]), 0, 360*64)
 
@@ -127,15 +132,30 @@ class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
 gobject.type_register(CircleLayer)
 
 
+class DummyServer:
+    def __init__(self, config):
+        self.config = config
+        self.pings = []
+
+    def check_distance(self, lat, lon):
+        self.pings.append((lat,lon))
+        query_point = geopy.point.Point(lat, lon)
+        resp = []
+        for waypoint in self.config['waypoints']:
+            wp_point = geopy.point.Point(waypoint['lat'], waypoint['lon'])
+            d = geopy.distance.VincentyDistance(query_point, wp_point)
+            # TODO: Fuzz the distance
+            resp.append(d.kilometers)
+        return resp
 
 class UI(gtk.Window):
     def __init__(self, config):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.config = config
 
-        self.set_default_size(500, 500)
+        self.set_default_size(800, 800)
         self.connect('destroy', lambda x: gtk.main_quit())
-        self.set_title('OpenStreetMap GPS Mapper')
+        self.set_title('FuzzyWayPointRace PoC')
 
         self.vbox = gtk.VBox(False, 0)
         self.add(self.vbox)
@@ -152,7 +172,7 @@ class UI(gtk.Window):
         self.osm.layer_add(
                     DummyLayer())
 
-        self.sl = CircleLayer()
+        self.sl = CircleLayer(self.config)
         self.osm.layer_add(self.sl)
 
         self.osm.connect('button_release_event', self.map_clicked)
@@ -169,8 +189,6 @@ class UI(gtk.Window):
         self.osm.connect("query-tooltip", self.on_query_tooltip)
 
         self.latlon_entry = gtk.Entry()
-        self.radius_entry = gtk.Entry()
-        self.radius_entry.set_text("0.5")
 
         zoom_in_button = gtk.Button(stock=gtk.STOCK_ZOOM_IN)
         zoom_in_button.connect('clicked', self.zoom_in_clicked)
@@ -247,7 +265,6 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
 
         self.vbox.pack_end(ex, False)
         self.vbox.pack_end(self.latlon_entry, False)
-        self.vbox.pack_end(self.radius_entry, False)
         self.vbox.pack_end(hbox, False)
 
         gobject.timeout_add(100, self.home_clicked, None)
@@ -354,15 +371,19 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
         elif event.button == 3:
             ##self.add_marker('pin', lat, lon)
             self.add_marker('beacon', lat, lon)
-            rds = float(self.radius_entry.get_text().replace(',', '.'))
-            self.sl.add_circle(rds, lat, lon)
+            distances = server.check_distance(lat, lon)
+            for i in range(len(distances)):
+                print "i=%d d=%fkm c=%s" % (i, distances[i], self.config['colors'][i])
+                self.sl.add_circle(distances[i], lat, lon, self.config['colors'][i])
             
 
 if __name__ == "__main__":
     with open(os.path.realpath(__file__).replace('.py', '.yml')) as f:
         config = yaml.load(f)
+    server = DummyServer(config)
     u = UI(config)
     u.show_all()
     if os.name == "nt": gtk.gdk.threads_enter()
     gtk.main()
     if os.name == "nt": gtk.gdk.threads_leave()
+    print "Ping locations: %s" % repr(server.pings)

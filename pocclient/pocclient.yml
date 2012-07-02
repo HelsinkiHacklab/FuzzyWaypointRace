@@ -16,6 +16,14 @@ home:
     lon: 24.951253891
     zoom: 8
 distance_fuzz_factor: 0.1 #10% random error in distance
+distance_line_width: 2
+colors:
+    - "#CD0001"
+    - "#026701"
+    - "#FF6600"
+    - "#67329A"
+    - "#00349A"
+    - "#FFFF01"
 markers:
     pin:
         file: pin_marker.png
