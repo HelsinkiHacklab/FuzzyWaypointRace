@@ -93,7 +93,6 @@ class CircleLayer(gobject.GObject, osmgpsmap.GpsMapLayer):
             cmap = drawable.get_colormap()
             c = cmap.alloc_color(c)
             drawable.set_colormap(cmap)
-            print "circle[3]: %s repr(c)=%s" % (circle[3], repr(c))
             ggc = drawable.new_gc(c,c)
             ggc.set_line_attributes(self.config['distance_line_width'], ggc.line_style, ggc.cap_style, ggc.join_style)
             # TODO: There probably is a better way to calculate these but I don't care, this works now
@@ -366,7 +365,6 @@ Enter an repository URL to fetch map tiles from in the box below. Special metach
             self.add_marker('beacon', lat, lon)
             distances = server.check_distance(lat, lon)
             for i in range(len(distances)):
-                print "i=%d d=%fkm c=%s" % (i, distances[i], self.config['colors'][i])
                 self.sl.add_circle(distances[i], lat, lon, self.config['colors'][i])
             
 
