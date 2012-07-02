@@ -133,7 +133,7 @@ class DummyServer:
             wp_point = geopy.point.Point(waypoint['lat'], waypoint['lon'])
             d = geopy.distance.VincentyDistance(query_point, wp_point)
             real.append(d.kilometers)
-            reported.append(random.gauss(d.kilometers, self.config['distance_sigma']))
+            reported.append(random.gauss(d.kilometers, d.kilometers*self.config['distance_sigma_factor']))
         self.real_distances.append(real)
         self.reported_distances.append(reported)
         return reported

@@ -15,7 +15,7 @@ home:
     lat: 60.1948814392
     lon: 24.951253891
     zoom: 8
-distance_sigma: 0.1 #10% random error in distance
+distance_sigma_factor: 0.1 #10% random error in distance
 distance_line_width: 2
 colors:
     - "#CD0001"
